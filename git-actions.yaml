@@ -306,9 +306,9 @@ paths:
           description: Hook created
       security:
         - BearerAuth: []
-        
+
 components:
-schemas:
+  schemas:
     User:
       type: object
       properties:
@@ -459,8 +459,9 @@ schemas:
             type: string
         active:
           type: boolean
-securitySchemes:
-BearerAuth: # This is the correct security scheme reference
-type: http
-scheme: bearer
-bearerFormat: JWT
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
