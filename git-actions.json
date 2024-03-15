@@ -1,0 +1,410 @@
+openapi: 3.0.0
+info:
+  title: GitHub Integration API for GPT
+  version: "1.0"
+servers:
+  - url: https://api.github.com
+    description: GitHub API
+paths:
+  /user:
+    get:
+      operationId: getAuthenticatedUser
+      summary: Get the authenticated user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/{username}/repos:
+    get:
+      operationId: getUserRepositories
+      summary: Get user repositories
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Repository"
+  /repos/{owner}/{repo}/subscribers:
+    get:
+      operationId: listWatchers
+      summary: List watchers
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  /user/repos:
+    post:
+      operationId: createNewRepository
+      summary: Create a new repository
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewRepository"
+      responses:
+        "201":
+          description: Repository created
+  /repos/{owner}/{repo}:
+    delete:
+      operationId: deleteRepository
+      summary: Delete a repository
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Repository deleted
+  /repos/{owner}/{repo}/branches:
+    get:
+      operationId: listBranches
+      summary: List branches
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of branches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Branch"
+  /repos/{owner}/{repo}/issues:
+    get:
+      operationId: listRepositoryIssues
+      summary: List all issues for a repository
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: An array of issues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Issue"
+    post:
+      operationId: createIssue
+      summary: Create an issue
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewIssue"
+      responses:
+        "201":
+          description: Issue created
+  /repos/{owner}/{repo}/pulls:
+    get:
+      operationId: listPullRequests
+      summary: List all pull requests for a repository
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: An array of pull requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PullRequest"
+    post:
+      operationId: createPullRequest
+      summary: Create a pull request
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPullRequest"
+      responses:
+        "201":
+          description: Pull request created
+  /repos/{owner}/{repo}/hooks:
+    get:
+      operationId: listRepositoryHooks
+      summary: List all hooks for a repository
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: An array of hooks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hook"
+    post:
+      operationId: createHook
+      summary: Create a hook
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewHook"
+      responses:
+        "201":
+          description: Hook created
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        login:
+          type: string
+        id:
+          type: integer
+        avatar_url:
+          type: string
+        gravatar_id:
+          type: string
+        url:
+          type: string
+        html_url:
+          type: string
+        followers_url:
+          type: string
+        following_url:
+          type: string
+        gists_url:
+          type: string
+        starred_url:
+          type: string
+        subscriptions_url:
+          type: string
+        organizations_url:
+          type: string
+        repos_url:
+          type: string
+        events_url:
+          type: string
+        received_events_url:
+          type: string
+        type:
+          type: string
+        site_admin:
+          type: boolean
+    Repository:
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        name:
+          type: string
+        full_name:
+          type: string
+        private:
+          type: boolean
+        owner:
+          $ref: "#/components/schemas/User"
+        html_url:
+          type: string
+        description:
+          type: string
+        fork:
+          type: boolean
+        url:
+          type: string
+    NewRepository:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        private:
+          type: boolean
+        auto_init:
+          type: boolean
+        gitignore_template:
+          type: string
+        license_template:
+          type: string
+        allow_squash_merge:
+          type: boolean
+        allow_merge_commit:
+          type: boolean
+        allow_rebase_merge:
+          type: boolean
+    NewIssue:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        assignees:
+          type: array
+          items:
+            type: string
+        milestone:
+          type: integer
+        labels:
+          type: array
+          items:
+            type: string
+        assignee:
+          type: string
+    NewPullRequest:
+      type: object
+      required:
+        - title
+        - head
+        - base
+      properties:
+        title:
+          type: string
+        head:
+          type: string
+        base:
+          type: string
+        body:
+          type: string
+        maintainer_can_modify:
+          type: boolean
+    NewHook:
+      type: object
+      required:
+        - name
+        - config
+      properties:
+        name:
+          type: string
+        config:
+          type: object
+          required:
+            - url
+          properties:
+            url:
+              type: string
+            content_type:
+              type: string
+            secret:
+              type: string
+            insecure_ssl:
+              type: string
+            token:
+              type: string
+        events:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
