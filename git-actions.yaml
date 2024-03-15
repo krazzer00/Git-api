@@ -217,90 +217,98 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-      responses:
-        "200":
-          description: An array of pull requests
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PullRequest"
-      security:
-        - BearerAuth: []
-    post:
-      operationId: createPullRequest
-      summary: Create a pull request
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NewPullRequest"
-      responses:
-        "201":
-          description: Pull request created
-  /repos/{owner}/{repo}/hooks:
-    get:
-      operationId: listRepositoryHooks
-      summary: List all hooks for a repository
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: An array of hooks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Hook"
-    post:
-      operationId: createHook
-      summary: Create a hook
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NewHook"
-      responses:
-        "201":
-          description: Hook created
+            type:
+string
+responses:
+"200":
+description: An array of pull requests
+content:
+application/json:
+schema:
+type: array
+items:
+$ref: "#/components/schemas/PullRequest"
+security:
+- BearerAuth: []
+post:
+operationId: createPullRequest
+summary: Create a pull request
+parameters:
+- name: owner
+in: path
+required: true
+schema:
+type: string
+- name: repo
+in: path
+required: true
+schema:
+type: string
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/NewPullRequest"
+responses:
+"201":
+description: Pull request created
+security:
+- BearerAuth: []
+/repos/{owner}/{repo}/hooks:
+get:
+operationId: listRepositoryHooks
+summary: List all hooks for a repository
+parameters:
+- name: owner
+in: path
+required: true
+schema:
+type: string
+- name: repo
+in: path
+required: true
+schema:
+type: string
+responses:
+"200":
+description: An array of hooks
+content:
+application/json:
+schema:
+type: array
+items:
+$ref: "#/components/schemas/Hook"
+security:
+- BearerAuth: []
+post:
+operationId: createHook
+summary: Create a hook
+parameters:
+- name: owner
+in: path
+required: true
+schema:
+type: string
+- name: repo
+in: path
+required: true
+schema:
+type: string
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: "#/components/schemas/NewHook"
+responses:
+"201":
+description: Hook created
+security:
+- BearerAuth: []
+
 components:
-  schemas:
+schemas:
     User:
       type: object
       properties:
@@ -451,10 +459,8 @@ components:
             type: string
         active:
           type: boolean
-    securitySchemes:
-      tokenAuth:
-        type: http
-        scheme: bearer
-        bearerFormat: JWT
-  security:
-    - tokenAuth: []
+securitySchemes:
+BearerAuth: # This is the correct security scheme reference
+type: http
+scheme: bearer
+bearerFormat: JWT
