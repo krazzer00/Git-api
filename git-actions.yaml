@@ -56,6 +56,44 @@ paths:
       responses:
         '204':
           description: Репозиторий удален
+    patch:
+      operationId: updateRepository
+      summary: Обновление параметров репозитория
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                private:
+                  type: boolean
+                has_issues:
+                  type: boolean
+                has_projects:
+                  type: boolean
+                has_wiki:
+                  type: boolean
+      responses:
+        '200':
+          description: Репозиторий обновлен
   /repos/{owner}/{repo}/git/refs:
     get:
       operationId: listRepoBranches
@@ -184,6 +222,135 @@ paths:
       responses:
         '201':
           description: Pull request создан
+  /repos/{owner}/{repo}/contents/{path}:
+    put:
+      operationId: createOrUpdateFileOrDirectory
+      summary: Создание или обновление файла, или создание каталога
+      description: >
+        Создает новый файл или обновляет существующий по указанному пути.
+        Для создания каталога, добавьте файл в желаемый каталог (например, указав путь 'new_directory/new_file.txt').
+        Пустой файл можно использовать для инициализации каталога.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                content:
+                  type: string
+                  description: Содержимое файла в кодировке Base64. Для создания каталога, укажите содержимое для файла в этом каталоге.
+                branch:
+                  type: string
+                  description: Имя ветки, в которой будет создан файл. Если ветка не указана, используется ветка по умолчанию.
+      responses:
+        '201':
+          description: Файл или каталог создан
+        '404':
+          description: Репозиторий не найден
+  /repos/{owner}/{repo}/issues/{issue_number}:
+    patch:
+      operationId: updateIssue
+      summary: Обновление issue
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: issue_number
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                state:
+                  type: string
+                labels:
+                  type: array
+                  items:
+                    type: string
+                assignees:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Issue обновлено
+  /repos/{owner}/{repo}/collaborators/{username}:
+    put:
+      operationId: addCollaborator
+      summary: Добавление коллаборатора в репозиторий
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permission:
+                  type: string
+                  enum: [pull, push, admin]
+      responses:
+        '201':
+          description: Коллаборатор добавлен
+
+
 components:
   securitySchemes:
     BearerAuth:
