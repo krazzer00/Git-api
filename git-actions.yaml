@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-  title: GitHub Integration API for GPT
+  title: GitHub Integration API for Personal Use
   version: "1.0"
 servers:
   - url: https://api.github.com
-    description: GitHub API
+    description: GitHub API for Personal Use
 paths:
   /user:
     get:
@@ -17,6 +17,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+      security:
+        - BearerAuth: []
+  /repos/{owner}/{repo}:
+    get:
+      operationId: getSpecificRepository
+      summary: Get a specific repository owned by the user
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+            default: 'krazzer00'
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detailed repository information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Repository"
+      security:
+        - BearerAuth: []
   /users/{username}/repos:
     get:
       operationId: getUserRepositories
@@ -36,6 +63,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Repository"
+      security:
+        - BearerAuth: []
   /repos/{owner}/{repo}/subscribers:
     get:
       operationId: listWatchers
@@ -60,6 +89,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
+      security:
+        - BearerAuth: []
   /user/repos:
     post:
       operationId: createNewRepository
@@ -73,6 +104,8 @@ paths:
       responses:
         "201":
           description: Repository created
+      security:
+        - BearerAuth: []
   /repos/{owner}/{repo}:
     delete:
       operationId: deleteRepository
@@ -91,6 +124,8 @@ paths:
       responses:
         "204":
           description: Repository deleted
+      security:
+        - BearerAuth: []
   /repos/{owner}/{repo}/branches:
     get:
       operationId: listBranches
@@ -115,6 +150,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Branch"
+      security:
+        - BearerAuth: []
   /repos/{owner}/{repo}/issues:
     get:
       operationId: listRepositoryIssues
@@ -139,6 +176,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Issue"
+      security:
+        - BearerAuth: []
     post:
       operationId: createIssue
       summary: Create an issue
@@ -162,6 +201,8 @@ paths:
       responses:
         "201":
           description: Issue created
+      security:
+        - BearerAuth: []
   /repos/{owner}/{repo}/pulls:
     get:
       operationId: listPullRequests
@@ -186,6 +227,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PullRequest"
+      security:
+        - BearerAuth: []
     post:
       operationId: createPullRequest
       summary: Create a pull request
@@ -408,3 +451,10 @@ components:
             type: string
         active:
           type: boolean
+    securitySchemes:
+      tokenAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  security:
+    - tokenAuth: []
