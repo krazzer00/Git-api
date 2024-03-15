@@ -1,135 +1,47 @@
 openapi: 3.0.0
 info:
-  title: GitHub Integration API for Personal Use
-  version: "1.0"
+  title: GitHub Full Access API
+  description: API для полного доступа к GitHub аккаунту, включая приватные репозитории и создание файлов.
+  version: 1.0.0
 servers:
   - url: https://api.github.com
-    description: GitHub API for Personal Use
+    description: GitHub API
 paths:
-  /user:
-    get:
-      operationId: getAuthenticatedUser
-      summary: Get the authenticated user
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-      security:
-        - BearerAuth: []
-  /repos/{owner}/{repo}:
-    get:
-      operationId: getSpecificRepository
-      summary: Get a specific repository owned by the user
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-            default: 'krazzer00'
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Detailed repository information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Repository"
-      security:
-        - BearerAuth: []
-  /users/{username}/repos:
-    get:
-      operationId: getUserRepositories
-      summary: Get user repositories
-      parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Repository"
-      security:
-        - BearerAuth: []
-  /repos/{owner}/{repo}/subscribers:
-    get:
-      operationId: listWatchers
-      summary: List watchers
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-      security:
-        - BearerAuth: []
   /user/repos:
+    get:
+      operationId: listUserRepos
+      summary: Список репозиториев пользователя
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список репозиториев
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Repository'
     post:
-      operationId: createNewRepository
-      summary: Create a new repository
+      operationId: createUserRepo
+      summary: Создание репозитория пользователя
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewRepository"
+              $ref: '#/components/schemas/RepositoryCreate'
       responses:
-        "201":
-          description: Repository created
-      security:
-        - BearerAuth: []
+        '201':
+          description: Репозиторий создан
   /repos/{owner}/{repo}:
     delete:
       operationId: deleteRepository
-      summary: Delete a repository
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "204":
-          description: Repository deleted
+      summary: Удаление репозитория
       security:
         - BearerAuth: []
-  /repos/{owner}/{repo}/branches:
-    get:
-      operationId: listBranches
-      summary: List branches
       parameters:
         - name: owner
           in: path
@@ -142,20 +54,40 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: List of branches
+        '204':
+          description: Репозиторий удален
+  /repos/{owner}/{repo}/git/refs:
+    get:
+      operationId: listRepoBranches
+      summary: Список веток репозитория
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список веток
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Branch"
-      security:
-        - BearerAuth: []
+                  $ref: '#/components/schemas/Branch'
   /repos/{owner}/{repo}/issues:
     get:
-      operationId: listRepositoryIssues
-      summary: List all issues for a repository
+      operationId: listRepoIssues
+      summary: Список issues репозитория
+      security:
+        - BearerAuth: []
       parameters:
         - name: owner
           in: path
@@ -168,19 +100,19 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: An array of issues
+        '200':
+          description: Список issues
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Issue"
+                  $ref: '#/components/schemas/Issue'
+    post:
+      operationId: createRepoIssue
+      summary: Создание issue в репозитории
       security:
         - BearerAuth: []
-    post:
-      operationId: createIssue
-      summary: Create an issue
       parameters:
         - name: owner
           in: path
@@ -197,16 +129,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewIssue"
+              $ref: '#/components/schemas/IssueCreate'
       responses:
-        "201":
-          description: Issue created
-      security:
-        - BearerAuth: []
+        '201':
+          description: Issue создан
   /repos/{owner}/{repo}/pulls:
     get:
-      operationId: listPullRequests
-      summary: List all pull requests for a repository
+      operationId: listRepoPullRequests
+      summary: Список pull requests репозитория
+      security:
+        - BearerAuth: []
       parameters:
         - name: owner
           in: path
@@ -219,19 +151,19 @@ paths:
           schema:
             type: string
       responses:
-        "200":
-          description: An array of pull requests
+        '200':
+          description: Список pull requests
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PullRequest"
+                  $ref: '#/components/schemas/PullRequest'
+    post:
+      operationId: createRepoPullRequest
+      summary: Создание pull request в репозитории
       security:
         - BearerAuth: []
-    post:
-      operationId: createPullRequest
-      summary: Create a pull request
       parameters:
         - name: owner
           in: path
@@ -248,131 +180,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewPullRequest"
+              $ref: '#/components/schemas/PullRequestCreate'
       responses:
-        "201":
-          description: Pull request created
-      security:
-        - BearerAuth: []
-
-  /repos/{owner}/{repo}/hooks:
-    get:
-      operationId: listRepositoryHooks
-      summary: List all hooks for a repository
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: An array of hooks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Hook"
-      security:
-        - BearerAuth: []
-    post:
-      operationId: createHook
-      summary: Create a hook
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NewHook"
-      responses:
-        "201":
-          description: Hook created
-      security:
-        - BearerAuth: []
-
+        '201':
+          description: Pull request создан
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
-    User:
-      type: object
-      properties:
-        login:
-          type: string
-        id:
-          type: integer
-        avatar_url:
-          type: string
-        gravatar_id:
-          type: string
-        url:
-          type: string
-        html_url:
-          type: string
-        followers_url:
-          type: string
-        following_url:
-          type: string
-        gists_url:
-          type: string
-        starred_url:
-          type: string
-        subscriptions_url:
-          type: string
-        organizations_url:
-          type: string
-        repos_url:
-          type: string
-        events_url:
-          type: string
-        received_events_url:
-          type: string
-        type:
-          type: string
-        site_admin:
-          type: boolean
     Repository:
       type: object
       properties:
         id:
           type: integer
-        node_id:
-          type: string
         name:
-          type: string
-        full_name:
           type: string
         private:
           type: boolean
-        owner:
-          $ref: "#/components/schemas/User"
-        html_url:
-          type: string
-        description:
-          type: string
-        fork:
-          type: boolean
-        url:
-          type: string
-    NewRepository:
+    RepositoryCreate:
       type: object
-      required:
-        - name
       properties:
         name:
           type: string
@@ -382,20 +211,25 @@ components:
           type: boolean
         auto_init:
           type: boolean
-        gitignore_template:
-          type: string
-        license_template:
-          type: string
-        allow_squash_merge:
-          type: boolean
-        allow_merge_commit:
-          type: boolean
-        allow_rebase_merge:
-          type: boolean
-    NewIssue:
+          description: Whether the repository is initialized with a README
+    Branch:
       type: object
-      required:
-        - title
+      properties:
+        name:
+          type: string
+    Issue:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        state:
+          type: string
+    IssueCreate:
+      type: object
       properties:
         title:
           type: string
@@ -405,20 +239,19 @@ components:
           type: array
           items:
             type: string
-        milestone:
-          type: integer
-        labels:
-          type: array
-          items:
-            type: string
-        assignee:
-          type: string
-    NewPullRequest:
+    PullRequest:
       type: object
-      required:
-        - title
-        - head
-        - base
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        state:
+          type: string
+    PullRequestCreate:
+      type: object
       properties:
         title:
           type: string
@@ -428,40 +261,3 @@ components:
           type: string
         body:
           type: string
-        maintainer_can_modify:
-          type: boolean
-    NewHook:
-      type: object
-      required:
-        - name
-        - config
-      properties:
-        name:
-          type: string
-        config:
-          type: object
-          required:
-            - url
-          properties:
-            url:
-              type: string
-            content_type:
-              type: string
-            secret:
-              type: string
-            insecure_ssl:
-              type: string
-            token:
-              type: string
-        events:
-          type: array
-          items:
-            type: string
-        active:
-          type: boolean
-
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
